@@ -31,6 +31,8 @@ private:
 	uint8_t *buffer;        // display buffer
 	uint8_t width;          // panel width (128)
 	uint8_t height;         // panel height (32 or 64)
+	bool flip_x;
+	bool flip_y;
 	uint8_t refresh_top = 0;    // "Dirty" window
 	uint8_t refresh_left = 0;
 	uint8_t refresh_right = 0;
@@ -45,7 +47,7 @@ public:
 	 * @param   sda_pin  SDA Pin
 	 * @param   type     Panel type
 	 */
-	OLED(gpio_num_t scl, gpio_num_t sda, ssd1306_panel_type_t type);
+	OLED(gpio_num_t scl, gpio_num_t sda, ssd1306_panel_type_t type, bool flip_x = false, bool flip_y = false);
 	/**
 	 * @brief   Constructor
 	 * @param   scl_pin  SCL Pin
@@ -54,7 +56,7 @@ public:
 	 * @param   address  I2C Address(usually 0x78)
 	 */
 	OLED(gpio_num_t scl, gpio_num_t sda, ssd1306_panel_type_t type,
-			uint8_t address);
+			uint8_t address, bool flip_x = false, bool flip_y = false);
 	/**
 	 * @brief   Initialize OLED panel
 	 * @return  true if successful

@@ -1,38 +1,35 @@
 #include "ssd1306.hpp"
 
 OLED::OLED(gpio_num_t scl, gpio_num_t sda, ssd1306_panel_type_t type,
-		uint8_t address) {
+		uint8_t address, bool flip_x, bool flip_y) 
+    : type(type), address(address), buffer(NULL), flip_x(flip_x), flip_y(flip_y)
+{
 	i2c = new I2C(scl, sda);
-	this->type = type;
-	this->address = address;
 
 	switch (type) {
 	case SSD1306_128x64:
-		buffer = NULL;
 		width = 128;
 		height = 64;
 		break;
 	case SSD1306_128x32:
-		buffer = NULL;
 		width = 128;
 		height = 32;
 		break;
 	}
 }
 
-OLED::OLED(gpio_num_t scl, gpio_num_t sda, ssd1306_panel_type_t type) {
+OLED::OLED(gpio_num_t scl, gpio_num_t sda, ssd1306_panel_type_t type,
+	   bool flip_x, bool flip_y)
+    : type(type), address(0x78), buffer(NULL), flip_x(flip_x), flip_y(flip_y)
+{
 	i2c = new I2C(scl, sda);
-	this->type = type;
-	this->address = 0x78;
 
 	switch (type) {
 	case SSD1306_128x64:
-		buffer = (uint8_t*) malloc(1024); // 128 * 64 / 8
 		width = 128;
 		height = 64;
 		break;
 	case SSD1306_128x32:
-		buffer = (uint8_t*) malloc(512);  // 128 * 32 / 8
 		width = 128;
 		height = 32;
 		break;
@@ -279,6 +276,14 @@ void OLED::draw_pixel(int8_t x, int8_t y, ssd1306_color_t color) {
 	if ((x >= width) || (x < 0) || (y >= height) || (y < 0))
 		return;
 
+	if (flip_x) {
+	    x = width - x - 1;
+	}
+
+	if (flip_y) {
+	    y = height - y - 1;
+	}
+
 	index = x + (y / 8) * width;
 	switch (color) {
 	case WHITE:
@@ -313,6 +318,14 @@ void OLED::draw_hline(int8_t x, int8_t y, uint8_t w, ssd1306_color_t color) {
 		return;
 	if (x + w > width)
 		w = width - x;
+
+	if (flip_x) {
+	    x = width - x - w;
+	}
+
+	if (flip_y) {
+	    y = height - y - 1;
+	}
 
 	t = w;
 	index = x + (y / 8) * width;
@@ -361,6 +374,14 @@ void OLED::draw_vline(int8_t x, int8_t y, uint8_t h, ssd1306_color_t color) {
 		return;
 	if (y + h > height)
 		h = height - y;
+
+	if (flip_x) {
+	    x = width - x - 1;
+	}
+
+	if (flip_y) {
+	    y = height - y - h;
+	}
 
 	t = h;
 	index = x + (y / 8) * width;
